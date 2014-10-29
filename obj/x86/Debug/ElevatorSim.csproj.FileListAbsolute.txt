@@ -1,0 +1,4 @@
+D:\Libraries\Documents\Visual Studio 2010\ElevatorSim\bin\Debug\ElevatorSim.exe
+D:\Libraries\Documents\Visual Studio 2010\ElevatorSim\bin\Debug\ElevatorSim.pdb
+D:\Libraries\Documents\Visual Studio 2010\ElevatorSim\obj\x86\Debug\ElevatorSim.exe
+D:\Libraries\Documents\Visual Studio 2010\ElevatorSim\obj\x86\Debug\ElevatorSim.pdb
