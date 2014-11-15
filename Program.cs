@@ -9,6 +9,7 @@ namespace ElevatorSim
     {
         static void Main(string[] args)
         {
+            Log log = new Log();
             Tower tower = new Tower();
             tower.Elevators.Add(new Elevator(1));
             tower.Call(20, Motion.Up);

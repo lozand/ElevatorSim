@@ -20,6 +20,8 @@ namespace ElevatorSim
         public Motion Direction { get; set; }
         public int? StopAt { get; set; }
 
+        Log log = new Log();
+
         public void MoveToFloor(int floor)
         {
             ShowFloor();
@@ -61,6 +63,7 @@ namespace ElevatorSim
         private void ShowFloor()
         {
             Console.WriteLine("I'm on floor {0}", CurrentFloor.ToString());
+            log.WriteToFile(String.Format("I'm on floor {0}", CurrentFloor.ToString()));
         }
     }
 }
