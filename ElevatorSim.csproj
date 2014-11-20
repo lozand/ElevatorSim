@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Call.cs" />
+    <Compile Include="Command.cs" />
     <Compile Include="Elevator.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Motion.cs" />
