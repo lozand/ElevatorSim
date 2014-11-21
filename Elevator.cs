@@ -11,11 +11,14 @@ namespace ElevatorSim
     {
         public Elevator(int currentFloor)
         {
+            Console.WriteLine("Constructing Elevator...");
             CurrentFloor = currentFloor;
             Direction = Motion.None;
             CommandQueue = new List<Command>();
             ElevatorState = true;
-            RunElevator();
+            Task run = new Task(new Action(RunElevator));
+            run.Start();
+            Console.WriteLine("Done Constructing Elevator.");
         }
 
         public List<Command> CommandQueue { get; set; }
@@ -34,36 +37,57 @@ namespace ElevatorSim
         {
             while (ElevatorState)
             {
-                var direction = GetDirection();
-                var nextFloor = 0;
-                var cmd = new Command(0);
-                if (direction == Motion.Up)
+                if (CommandQueue.Count() != 0)
                 {
-                    cmd = CommandQueue.Where(c => c.Floor > CurrentFloor).OrderBy(c => c.Floor).FirstOrDefault();
-                    
-                }
-                else if (direction == Motion.Down)
-                {
-                    cmd = CommandQueue.Where(c => c.Floor < CurrentFloor).OrderByDescending(c => c.Floor).FirstOrDefault();
-                }
-
-                if (cmd != null)
-                {
-                    nextFloor = cmd.Floor;
-                    if (nextFloor > CurrentFloor)
+                    var direction = GetDirection();
+                    var nextFloor = 0;
+                    var cmd = new Command(0);
+                    if (direction == Motion.Up)
                     {
-                        GoUpOne();
+                        cmd = CommandQueue.Where(c => c.Floor > CurrentFloor).OrderBy(c => c.Floor).FirstOrDefault();
+
+                    }
+                    else if (direction == Motion.Down)
+                    {
+                        cmd = CommandQueue.Where(c => c.Floor < CurrentFloor).OrderByDescending(c => c.Floor).FirstOrDefault();
+                    }
+
+                    if (cmd != null && cmd.Floor != 0)
+                    {
+                        nextFloor = cmd.Floor;
+                        Console.WriteLine("Headed to {0}!!", cmd.Floor.ToString());
+                        if (nextFloor > CurrentFloor)
+                        {
+                            GoUpOne();
+                        }
+                        else
+                        {
+                            GoDownOne();
+                        }
                     }
                     else
                     {
-                        GoDownOne();
+                        Direction = Motion.None;
                     }
                 }
                 else
                 {
-                    Direction = Motion.None;
+                    //Console.WriteLine("Command Queue Empty!!");
                 }
-                
+
+                if (CommandQueue.Any(q => q.Floor == CurrentFloor))
+                {
+                    List<Command> cmdToRemove = new List<Command>();
+                    foreach (Command cmd in CommandQueue.Where(q => q.Floor == CurrentFloor))
+                    {
+                        cmdToRemove.Add(cmd);
+                    }
+                    foreach (Command cmd in cmdToRemove)
+                    {
+                        CommandQueue.Remove(cmd);
+                    }
+                }
+
             }
 
             Console.Write("Elevator Done!");

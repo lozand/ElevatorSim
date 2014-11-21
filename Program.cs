@@ -12,8 +12,11 @@ namespace ElevatorSim
             Log log = new Log();
             Tower tower = new Tower();
             tower.Elevators.Add(new Elevator(1));
-            tower.TowerState = true;
-            tower.Call(20, Motion.Up);
+            Console.WriteLine("Sending Call to floor 10 Up");
+            tower.Call(10, Motion.Up);
+            Console.WriteLine("Sending Call to floor 5 Down");
+            tower.Call(5, Motion.Down);
+            Console.WriteLine("done Here");
             Console.Read();
         }
     }
