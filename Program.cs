@@ -10,14 +10,21 @@ namespace ElevatorSim
         static void Main(string[] args)
         {
             Log log = new Log();
-            Tower tower = new Tower();
-            tower.Elevators.Add(new Elevator(1));
-            Console.WriteLine("Sending Call to floor 10 Up");
+            Tower tower = new Tower(log);
+            tower.Elevators.Add(new Elevator(1, log));
+            log.WriteToFile("Sending Call to floor 10 Up");
             tower.Call(10, Motion.Up);
-            Console.WriteLine("Sending Call to floor 5 Down");
+            log.WriteToFile("Sending Call to floor 5 Down");
             tower.Call(5, Motion.Down);
-            Console.WriteLine("done Here");
-            Console.Read();
+            log.WriteToFile("done Here");
+            bool isDone = false;
+            isDone = tower.Elevators.Where(e => e.Direction == Motion.None).FirstOrDefault() == null 
+                && tower.CallList.Count == 0 
+                && tower.Elevators.Where(e => e.CommandQueue.Count == 0) == tower.Elevators;
+            while (!isDone)
+            {
+                //continue looping
+            }
         }
     }
 }

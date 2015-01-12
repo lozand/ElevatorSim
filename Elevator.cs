@@ -9,16 +9,16 @@ namespace ElevatorSim
 {
     public class Elevator
     {
-        public Elevator(int currentFloor)
+        public Elevator(int currentFloor, Log log)
         {
-            Console.WriteLine("Constructing Elevator...");
+            log.WriteToFile("Constructing Elevator...");
             CurrentFloor = currentFloor;
             Direction = Motion.None;
             CommandQueue = new List<Command>();
             ElevatorState = true;
             Task run = new Task(new Action(RunElevator));
             run.Start();
-            Console.WriteLine("Done Constructing Elevator.");
+            log.WriteToFile("Done Constructing Elevator.");
         }
 
         public List<Command> CommandQueue { get; set; }
@@ -33,8 +33,25 @@ namespace ElevatorSim
 
         public bool ElevatorState { get; set; }
 
+        public void AddToCommandQueue(int floor)
+        {
+            log.WriteToFile(string.Format("Adding command to floor {0}", floor.ToString()));
+            CommandQueue.Add(new Command(floor));
+        }
+
+        public void RemoveFromCommandQueue(Command cmd)
+        {
+            CommandQueue.Remove(cmd);
+        }
+
+        public void RemoveFromCommandQueue(int floor)
+        {
+            CommandQueue.RemoveAll(q => q.Floor == floor);
+        }
+
         public void RunElevator()
         {
+            log.WriteToFile("RunElevator()");
             while (ElevatorState)
             {
                 if (CommandQueue.Count() != 0)
@@ -55,7 +72,7 @@ namespace ElevatorSim
                     if (cmd != null && cmd.Floor != 0)
                     {
                         nextFloor = cmd.Floor;
-                        Console.WriteLine("Headed to {0}!!", cmd.Floor.ToString());
+                        log.WriteToFile(String.Format("Headed to {0}!!", cmd.Floor.ToString()));
                         if (nextFloor > CurrentFloor)
                         {
                             GoUpOne();
@@ -90,7 +107,7 @@ namespace ElevatorSim
 
             }
 
-            Console.Write("Elevator Done!");
+            log.WriteToFile("Elevator Done!");
         }
 
         public void MoveToFloor(int floor)
@@ -137,7 +154,7 @@ namespace ElevatorSim
 
         private void ShowFloor()
         {
-            Console.WriteLine("I'm on floor {0}", CurrentFloor.ToString());
+            //Console.WriteLine("I'm on floor {0}", CurrentFloor.ToString());
             log.WriteToFile(String.Format("I'm on floor {0}", CurrentFloor.ToString()));
         }
 

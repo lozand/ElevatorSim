@@ -8,16 +8,19 @@ namespace ElevatorSim
 {
     public class Tower
     {
-        public Tower()
+        public Tower(Log logger)
         {
-            Console.WriteLine("Constructing Tower...");
+            logger.WriteToFile("Constructing Tower...");
             Elevators = new List<Elevator>();
             CallList = new List<Call>();
             TowerState = true;
             Task task = new Task(new Action(RunTower));
             task.Start();
-            Console.WriteLine("Done Constructing Tower.");
+            logger.WriteToFile("Done Constructing Tower.");
+            log = logger;
         }
+
+        private Log log { get; set; }
 
         public bool TowerState { get; set; }
 
@@ -29,19 +32,27 @@ namespace ElevatorSim
         {
             Call cmd = new Call(sourceFloor, direction);
             CallList.Add(cmd);
+            log.WriteToFile(String.Format("Added to CallList: Floor {0}", sourceFloor.ToString()));
         }
 
         public void RunTower()
         {
+            log.WriteToFile("RunTower()");
             while (TowerState)
             {
+                log.WriteToFile("looping through RunTower()");    
                 var unAddressedCommands = CallList.Where(c => !c.IsAddressed);
 
-                foreach (Call cmd in unAddressedCommands)
+                if (unAddressedCommands.Count() > 1)
                 {
-                    Console.WriteLine("Tower.RunTower.Foreach");
-                    var direction = cmd.Direction;
-                    var sourceFloor = cmd.Floor;
+                    log.WriteToFile("unAddressedCommands > 1");
+                }
+
+                foreach (Call call in unAddressedCommands)
+                {
+                    log.WriteToFile(String.Format("Tower.RunTower.Foreach - Command to floor: {0}", call.Floor.ToString()));
+                    var direction = call.Direction;
+                    var sourceFloor = call.Floor;
                     var possibleElevators = Elevators.Where(e => e.Direction == Motion.None
                                                                 || (e.Direction == direction
                                                                     && ((sourceFloor > e.CurrentFloor && e.Direction == Motion.Down)
@@ -51,19 +62,20 @@ namespace ElevatorSim
 
                     if (elevatorToSend != null)
                     {
-                        cmd.IsAddressed = true;
-                        Console.WriteLine("Floor {0} is addressed!!", cmd.Floor.ToString());
-                        elevatorToSend.CommandQueue.Add(new Command(cmd.Floor));
+                        call.IsAddressed = true;
+                        log.WriteToFile(String.Format("Floor {0} is addressed!!", call.Floor.ToString()));
+                        elevatorToSend.AddToCommandQueue(call.Floor);
+                        RemoveCall(call);
                     }
                     else
                     {
-                        Console.WriteLine("Floor {0} is NOT addressed!!", cmd.Floor.ToString());
-                        cmd.IsAddressed = false;
+                        log.WriteToFile(string.Format("Floor {0} is NOT addressed!!", call.Floor.ToString()));
+                        call.IsAddressed = false;
                     }
                 }
             }
 
-            Console.WriteLine("Done!");
+            log.WriteToFile("Done!");
 
             //foreach (Elevator shaft in Elevators)
             //{
@@ -80,7 +92,12 @@ namespace ElevatorSim
             //        shaft.MoveToFloor(sourceFloor);
             //    }
             //}
-        }        
+        }
+
+        private void RemoveCall(Call call)
+        {
+            CallList.Remove(call);
+        }
 
     }
 }
