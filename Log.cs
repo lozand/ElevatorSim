@@ -18,7 +18,7 @@ namespace ElevatorSim
         public void WriteToFile(string text)
         {
             Console.WriteLine(text);
-            using(StreamWriter sw = File.AppendText(fileName))
+            using (StreamWriter sw = File.AppendText(fileName))
             {
                 sw.Write(text);
                 sw.WriteLine("");

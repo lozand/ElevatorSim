@@ -16,8 +16,9 @@ namespace ElevatorSim
             Direction = Motion.None;
             CommandQueue = new List<Command>();
             ElevatorState = true;
-            Task run = new Task(new Action(RunElevator));
-            run.Start();
+            Thread thread = new Thread(new ThreadStart(RunElevator));
+            //Task run = new Task(new Action(RunElevator));
+            thread.Start();
             log.WriteToFile("Done Constructing Elevator.");
         }
 
@@ -98,10 +99,12 @@ namespace ElevatorSim
                     foreach (Command cmd in CommandQueue.Where(q => q.Floor == CurrentFloor))
                     {
                         cmdToRemove.Add(cmd);
+
                     }
                     foreach (Command cmd in cmdToRemove)
                     {
-                        CommandQueue.Remove(cmd);
+                        //CommandQueue.Remove(cmd);
+                        RemoveFromCommandQueue(cmd);
                     }
                 }
 
