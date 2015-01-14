@@ -50,7 +50,7 @@ namespace ElevatorSim
 
         public void RunTower()
         {
-            log.WriteToFile("RunTower()");
+            log.WriteToFile("Starting RunTower() in new Thread");
             while (TowerState)
             {
                 if (CallList.Count > 0)
@@ -59,7 +59,7 @@ namespace ElevatorSim
                     var unAddressedCommands = CallList.Where(c => !c.IsAddressed);
                     foreach (Call call in unAddressedCommands)
                     {
-                        log.WriteToFile(String.Format("Tower.RunTower.Foreach - Command to floor: {0}", call.Floor.ToString()));
+                        //log.WriteToFile(String.Format("Tower.RunTower.Foreach - Command to floor: {0}", call.Floor.ToString()));
                         var direction = call.Direction;
                         var sourceFloor = call.Floor;
                         var possibleElevators = Elevators.Where(e => e.Direction == Motion.None
@@ -80,7 +80,7 @@ namespace ElevatorSim
                         }
                         else
                         {
-                            log.WriteToFile(string.Format("Floor {0} is NOT addressed!!", call.Floor.ToString()));
+                            //log.WriteToFile(string.Format("Floor {0} is NOT addressed!!", call.Floor.ToString()));
                             //SetCallAddress(call, false);
                         }
                     }

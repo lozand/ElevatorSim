@@ -16,6 +16,7 @@ namespace ElevatorSim
             Direction = Motion.None;
             CommandQueue = new List<Command>();
             ElevatorState = true;
+            IsAddingCommand = false;
             Thread thread = new Thread(new ThreadStart(RunElevator));
             //Task run = new Task(new Action(RunElevator));
             thread.Start();
@@ -25,6 +26,7 @@ namespace ElevatorSim
         public List<Command> CommandQueue { get; set; }
         public int CurrentFloor { get; set; }
         public int LastFloor { get; set; }
+        public bool IsAddingCommand { get; set; }
         public bool InbetweenFloors { get; set; }
         public Motion Direction { get; set; }
         public int? StopAt { get; set; }
@@ -36,8 +38,22 @@ namespace ElevatorSim
 
         public void AddToCommandQueue(int floor)
         {
+            IsAddingCommand = true;
             log.WriteToFile(string.Format("Adding command to floor {0}", floor.ToString()));
+            if (CurrentFloor > floor)
+            {
+                Direction = Motion.Down;
+            }
+            else if (CurrentFloor < floor)
+            {
+                Direction = Motion.Up;
+            }
+            else
+            {
+                Direction = Motion.None;
+            }
             CommandQueue.Add(new Command(floor));
+            IsAddingCommand = false;
         }
 
         public void RemoveFromCommandQueue(Command cmd)
@@ -52,12 +68,13 @@ namespace ElevatorSim
 
         public void RunElevator()
         {
-            log.WriteToFile("RunElevator()");
+            log.WriteToFile("Starting RunElevator() in new thread");
             while (ElevatorState)
             {
                 if (CommandQueue.Count() != 0)
                 {
-                    var direction = GetDirection();
+                    //var direction = GetDirection();
+                    var direction = Direction;
                     var nextFloor = 0;
                     var cmd = new Command(0);
                     if (direction == Motion.Up)
@@ -85,26 +102,39 @@ namespace ElevatorSim
                     }
                     else
                     {
-                        Direction = Motion.None;
+                        //log.WriteToFile("no motion");
+                        //Direction = Motion.None;
                     }
                 }
                 else
                 {
                     //Console.WriteLine("Command Queue Empty!!");
+                    if (!IsAddingCommand)
+                    {
+                        Direction = Motion.None;
+                    }
                 }
 
-                if (CommandQueue.Any(q => q.Floor == CurrentFloor))
+                bool successfulCheck = false;
+                while (!successfulCheck)
                 {
-                    List<Command> cmdToRemove = new List<Command>();
-                    foreach (Command cmd in CommandQueue.Where(q => q.Floor == CurrentFloor))
+                    if (!IsAddingCommand)
                     {
-                        cmdToRemove.Add(cmd);
+                        if (CommandQueue.Any(q => q.Floor == CurrentFloor))
+                        {
+                            List<Command> cmdToRemove = new List<Command>();
+                            foreach (Command cmd in CommandQueue.Where(q => q.Floor == CurrentFloor))
+                            {
+                                cmdToRemove.Add(cmd);
 
-                    }
-                    foreach (Command cmd in cmdToRemove)
-                    {
-                        //CommandQueue.Remove(cmd);
-                        RemoveFromCommandQueue(cmd);
+                            }
+                            foreach (Command cmd in cmdToRemove)
+                            {
+                                //CommandQueue.Remove(cmd);
+                                RemoveFromCommandQueue(cmd);
+                            }
+                        }
+                        successfulCheck = true;
                     }
                 }
 
