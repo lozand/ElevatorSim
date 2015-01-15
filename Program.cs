@@ -12,14 +12,14 @@ namespace ElevatorSim
         {
             Log log = new Log();
             Tower tower = new Tower(log);
-            tower.Elevators.Add(new Elevator(1, log));
-            log.WriteToFile("Sending Call to floor 10 Up");
-            tower.Call(10, Motion.Up);
+            tower.Elevators.Add(new Elevator(1, log, 1));
+            tower.Elevators.Add(new Elevator(1, log, 2));
+            tower.Call(14, Motion.Up);
             Thread.Sleep(4000);
-            log.WriteToFile("Sending Call to floor 5 Down");
             tower.Call(5, Motion.Down);
-            log.WriteToFile("done Here");
             bool isDone = false;
+            Thread.Sleep(12000);
+            tower.Call(3, Motion.Up);
             isDone = false;
             while (!isDone)
             {
@@ -27,7 +27,13 @@ namespace ElevatorSim
                 && tower.CallList.Count == 0
                 && tower.Elevators.Where(e => e.CommandQueue.Count == 0).Count() == tower.Elevators.Count;
             }
-            log.WriteToFile("done with simulation!");
+            log.WriteToFile("done with simulation!", "g");
+
+            foreach (Elevator e in tower.Elevators)
+            {
+                e.Terminate();
+            }
+            tower.Terminate();
         }
     }
 }

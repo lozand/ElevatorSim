@@ -10,18 +10,31 @@ namespace ElevatorSim
     {
         public Log()
         {
+            IsWriting = false;
             Initialize();   
         }
 
         string fileName = "D:\\Log.txt";
 
-        public void WriteToFile(string text)
+        public void WriteToFile(string text, string level)
         {
-            Console.WriteLine(text);
-            using (StreamWriter sw = File.AppendText(fileName))
+            bool successfulWrite = false;
+            while (!successfulWrite)
             {
-                sw.Write(text);
-                sw.WriteLine("");
+                if (!IsWriting)
+                {
+                    IsWriting = true;
+                    Set(level);
+                    Console.WriteLine(text);
+                    Reset();
+                    using (StreamWriter sw = File.AppendText(fileName))
+                    {
+                        sw.Write(text);
+                        sw.WriteLine("");
+                    }
+                    IsWriting = false;
+                    successfulWrite = true;
+                }
             }
         }
 
@@ -34,6 +47,37 @@ namespace ElevatorSim
             using (FileStream fs = File.Create(fileName))
             {
             }
+        }
+
+        private bool IsWriting { get; set; }
+
+        private void Set(string state = "")
+        {
+            switch (state.ToLower())
+            {
+                case "g":
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    break;
+                case "r":
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+                case "i":
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    break;
+                case "l":
+                    Console.BackgroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                    break;
+                default:
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
+            }
+        }
+
+        private void Reset()
+        {
+            Console.ResetColor();
         }
     }
 }

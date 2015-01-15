@@ -11,7 +11,7 @@ namespace ElevatorSim
     {
         public Tower(Log logger)
         {
-            logger.WriteToFile("Constructing Tower...");
+            logger.WriteToFile("Constructing Tower...","r");
             Elevators = new List<Elevator>();
             CallList = new List<Call>();
             TowerState = true;
@@ -19,13 +19,13 @@ namespace ElevatorSim
             Thread thread = new Thread(new ThreadStart(RunTower));
             //Task task = new Task(new Action(RunTower));
             thread.Start();
-            logger.WriteToFile("Done Constructing Tower.");
+            logger.WriteToFile("Done Constructing Tower.","r");
             log = logger;
         }
 
         private Log log { get; set; }
 
-        public bool TowerState { get; set; }
+        private bool TowerState { get; set; }
 
         public bool IsAssigning { get; set; }
 
@@ -42,7 +42,7 @@ namespace ElevatorSim
                 if (!IsAssigning)
                 {
                     CallList.Add(cmd);
-                    log.WriteToFile(String.Format("Added to CallList: Floor {0}", sourceFloor.ToString()));
+                    log.WriteToFile(String.Format("Added to CallList: Floor {0}", sourceFloor.ToString()),"i");
                     successfullyAddedCall = true;
                 }
             }
@@ -50,7 +50,7 @@ namespace ElevatorSim
 
         public void RunTower()
         {
-            log.WriteToFile("Starting RunTower() in new Thread");
+            log.WriteToFile("Starting RunTower() in new Thread","r");
             while (TowerState)
             {
                 if (CallList.Count > 0)
@@ -74,7 +74,7 @@ namespace ElevatorSim
                             //SetCallAddress(call, true);
                             //call.IsAddressed = true;
                             SetToRemove(call);
-                            log.WriteToFile(String.Format("Floor {0} is addressed!!", call.Floor.ToString()));
+                            log.WriteToFile(String.Format("Floor {0} is addressed! Sending call to Elevator {1}", call.Floor.ToString(), elevatorToSend.Id.ToString()), "i");
                             elevatorToSend.AddToCommandQueue(call.Floor);
                             //RemoveCall(call);
                         }
@@ -88,9 +88,7 @@ namespace ElevatorSim
                     RemoveCallsSetToRemove();
                 }
             }
-
-            log.WriteToFile("Done!");
-
+           
             //foreach (Elevator shaft in Elevators)
             //{
             //    if (shaft.Direction == direction && sourceFloor < shaft.CurrentFloor)
@@ -134,7 +132,6 @@ namespace ElevatorSim
             //    if (!IsAssigning)
             //    {
                     CallList.Remove(call);
-                    log.WriteToFile(string.Format("removed call to floor {0}", call.Floor));
             //        successfullyRemovedCall = true;
             //    }
             //}
@@ -149,6 +146,11 @@ namespace ElevatorSim
             {
                 a.IsAddressed = isAddressed;
             });
+        }
+
+        public void Terminate()
+        {
+            TowerState = false;
         }
 
     }

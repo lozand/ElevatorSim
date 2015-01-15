@@ -9,18 +9,20 @@ namespace ElevatorSim
 {
     public class Elevator
     {
-        public Elevator(int currentFloor, Log log)
+        public Elevator(int currentFloor, Log log, int id)
         {
-            log.WriteToFile("Constructing Elevator...");
+            log.WriteToFile(String.Format("Constructing Elevator {0}...", id.ToString()),"r");
             CurrentFloor = currentFloor;
             Direction = Motion.None;
             CommandQueue = new List<Command>();
             ElevatorState = true;
             IsAddingCommand = false;
+            this.log = log;
             Thread thread = new Thread(new ThreadStart(RunElevator));
             //Task run = new Task(new Action(RunElevator));
             thread.Start();
-            log.WriteToFile("Done Constructing Elevator.");
+            log.WriteToFile(String.Format("Done Constructing Elevator {0}.", id.ToString()),"r");
+            Id = id;
         }
 
         public List<Command> CommandQueue { get; set; }
@@ -31,15 +33,16 @@ namespace ElevatorSim
         public Motion Direction { get; set; }
         public int? StopAt { get; set; }
         const int StoppingThreshhold = 2;
+        public int Id { get; set; }
 
-        Log log = new Log();
+        Log log;
 
-        public bool ElevatorState { get; set; }
+        private bool ElevatorState { get; set; }
 
         public void AddToCommandQueue(int floor)
         {
             IsAddingCommand = true;
-            log.WriteToFile(string.Format("Adding command to floor {0}", floor.ToString()));
+            log.WriteToFile(string.Format("Adding to CommandList: Floor {0}", floor.ToString()),"i");
             if (CurrentFloor > floor)
             {
                 Direction = Motion.Down;
@@ -68,7 +71,7 @@ namespace ElevatorSim
 
         public void RunElevator()
         {
-            log.WriteToFile("Starting RunElevator() in new thread");
+            log.WriteToFile("Starting RunElevator() in new thread","r");
             while (ElevatorState)
             {
                 if (CommandQueue.Count() != 0)
@@ -90,14 +93,13 @@ namespace ElevatorSim
                     if (cmd != null && cmd.Floor != 0)
                     {
                         nextFloor = cmd.Floor;
-                        log.WriteToFile(String.Format("Headed to {0}!!", cmd.Floor.ToString()));
                         if (nextFloor > CurrentFloor)
                         {
-                            GoUpOne();
+                            GoUpOne(cmd.Floor);
                         }
                         else
                         {
-                            GoDownOne();
+                            GoDownOne(cmd.Floor);
                         }
                     }
                     else
@@ -139,8 +141,6 @@ namespace ElevatorSim
                 }
 
             }
-
-            log.WriteToFile("Elevator Done!");
         }
 
         public void MoveToFloor(int floor)
@@ -165,30 +165,37 @@ namespace ElevatorSim
             Direction = Motion.None;
         }
 
-        public void GoUpOne()
+        public void GoUpOne(int destination = 0)
         {
             LastFloor = CurrentFloor;
             InbetweenFloors = true;
             Thread.Sleep(2000);
             InbetweenFloors = false;
             CurrentFloor++;
-            ShowFloor();
+            ShowFloor(destination);
         }
 
-        public void GoDownOne()
+        public void GoDownOne(int destination = 0)
         {
             LastFloor = CurrentFloor;
             InbetweenFloors = true;
             Thread.Sleep(2000);
             InbetweenFloors = false;
             CurrentFloor--;
-            ShowFloor();
+            ShowFloor(destination);
         }
 
-        private void ShowFloor()
+        private void ShowFloor(int destination = 0)
         {
             //Console.WriteLine("I'm on floor {0}", CurrentFloor.ToString());
-            log.WriteToFile(String.Format("I'm on floor {0}", CurrentFloor.ToString()));
+            if (destination != 0)
+            {
+                log.WriteToFile(String.Format("Elevator {0} - Floor: {1} - Destination: {2}", this.Id.ToString(), CurrentFloor.ToString(), destination), "l");
+            }
+            else
+            {
+                log.WriteToFile(String.Format("Elevator {0} - Floor: {1} - Destination: ???", this.Id.ToString(), CurrentFloor.ToString()),"l");
+            }
         }
 
         private Motion GetDirection()
@@ -209,6 +216,11 @@ namespace ElevatorSim
                 //return Direction;
                 return Motion.None;
             }
+        }
+
+        public void Terminate()
+        {
+            ElevatorState = false;
         }
 
         //private void Task AwaitCommand()
