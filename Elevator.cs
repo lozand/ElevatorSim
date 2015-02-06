@@ -19,7 +19,6 @@ namespace ElevatorSim
             IsAddingCommand = false;
             this.log = log;
             Thread thread = new Thread(new ThreadStart(RunElevator));
-            //Task run = new Task(new Action(RunElevator));
             thread.Start();
             log.WriteToFile(String.Format("Done Constructing Elevator {0}.", id.ToString()),"r");
             Id = id;
@@ -104,13 +103,11 @@ namespace ElevatorSim
                     }
                     else
                     {
-                        //log.WriteToFile("no motion");
                         //Direction = Motion.None;
                     }
                 }
                 else
                 {
-                    //Console.WriteLine("Command Queue Empty!!");
                     if (!IsAddingCommand)
                     {
                         Direction = Motion.None;
@@ -132,7 +129,6 @@ namespace ElevatorSim
                             }
                             foreach (Command cmd in cmdToRemove)
                             {
-                                //CommandQueue.Remove(cmd);
                                 RemoveFromCommandQueue(cmd);
                             }
                         }
@@ -187,7 +183,6 @@ namespace ElevatorSim
 
         private void ShowFloor(int destination = 0)
         {
-            //Console.WriteLine("I'm on floor {0}", CurrentFloor.ToString());
             if (destination != 0)
             {
                 log.WriteToFile(String.Format("Elevator {0} - Floor: {1} - Destination: {2}", this.Id.ToString(), CurrentFloor.ToString(), destination), "l");
@@ -213,7 +208,6 @@ namespace ElevatorSim
             }
             else
             {
-                //return Direction;
                 return Motion.None;
             }
         }
@@ -222,13 +216,5 @@ namespace ElevatorSim
         {
             ElevatorState = false;
         }
-
-        //private void Task AwaitCommand()
-        //{
-        //    while(Direction != Motion.None)
-        //    {
-
-        //    }
-        //}
     }
 }

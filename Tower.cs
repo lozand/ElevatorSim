@@ -59,7 +59,6 @@ namespace ElevatorSim
                     var unAddressedCommands = CallList.Where(c => !c.IsAddressed);
                     foreach (Call call in unAddressedCommands)
                     {
-                        //log.WriteToFile(String.Format("Tower.RunTower.Foreach - Command to floor: {0}", call.Floor.ToString()));
                         var direction = call.Direction;
                         var sourceFloor = call.Floor;
                         var possibleElevators = Elevators.Where(e => e.Direction == Motion.None
@@ -88,22 +87,6 @@ namespace ElevatorSim
                     RemoveCallsSetToRemove();
                 }
             }
-           
-            //foreach (Elevator shaft in Elevators)
-            //{
-            //    if (shaft.Direction == direction && sourceFloor < shaft.CurrentFloor)
-            //    {
-            //        shaft.MoveToFloor(sourceFloor);
-            //    }
-            //    else if (shaft.Direction == direction && sourceFloor > shaft.CurrentFloor)
-            //    {
-            //        shaft.MoveToFloor(sourceFloor);
-            //    }
-            //    else
-            //    {
-            //        shaft.MoveToFloor(sourceFloor);
-            //    }
-            //}
         }
 
         private List<Call> CallsToRemove = new List<Call>();
@@ -118,7 +101,6 @@ namespace ElevatorSim
             
             foreach (Call call in CallsToRemove)
             {
-                //log.WriteToFile("about to remove this shit");
                 RemoveCall(call);
             }
             CallsToRemove.Clear();
